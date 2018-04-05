@@ -1,0 +1,13 @@
+[
+{
+	"id": 1,
+	"taskName": "dupa",
+	"minTime": 10,
+	"maxTime": 20
+}, {
+	"id": 2,
+	"taskName": "cipka",
+	"minTime": 50,
+	"maxTime": 60
+}
+]
