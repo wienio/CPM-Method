@@ -1,4 +1,8 @@
+// import { jsPlumb } from "./jsplumb";
+// import * as jsPlumb from 'jsplumb.js'
+
 var TASKID = 0
+var taskForm = '<form>   </form>'
 
 class Task {
     // Dodac trzeba cos zeby poprzednie taski byly powiazane
@@ -63,4 +67,19 @@ function readJsonTaskFile(jsonFile) {
     reader.readAsText(file);
 }
 
+function calculateCpm() {
+
+}
+
 document.getElementById('file-input').addEventListener('change', readJsonTaskFile, false);
+
+jsPlumb.ready(function () {  
+    console.log("jsplumb dziala")
+    console.log(jsPlumb)
+    
+    // var e0 = jsPlumb.addEndpoint("container0",{uuid:"ep0"}) //set your own uuid for endpoint to access later.
+    // e1 = jsPlumb.addEndpoint("container1",{uuid:"ep1"});  
+    // jsPlumb.connect({ uuids:[e0.getUuid(),e1.getUuid()] }); 
+            // (or) 
+    // jsPlumb.connect({ uuids:["ep0","ep1"] });
+});
