@@ -5,20 +5,54 @@ body {
     background-color: aliceblue;
 }
 
+p {
+    margin: 0;
+    padding-top: 10px;
+    margin-bottom: 5px;
+}
+
 h1 {
     display: flex;
 }
 
-.new-task {
-    width: 30vh;
+input[type="text"] {
+    font-size: 18px;
+}
+
+.task-container {
+    width: 25vh;
+    height: 15vh;
+    position: absolute;
+    background-color: #d3d3d3;
+    border: 1px solid #696969;
 }
 
 .calculate-cpm {
-    margin-top: 5%;
+    position: absolute;
+    bottom: 35%;
+    left: 5%;
 }
 
 .tasks {
     width: 100%;
     height: 50%;
-    background-color: blue;
+    border: solid red 1px;
+}
+
+.kontakt {
+    font-size: 30px;
+}
+
+#file-input {
+    position: absolute;
+    bottom: 35%;
+    left: 25%;
+}
+
+.task-text {
+    
+}
+
+.task-input {
+    margin-bottom: 5px
 }
