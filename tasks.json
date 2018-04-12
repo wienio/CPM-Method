@@ -2,17 +2,14 @@
 {
 	"id": 1,
 	"taskName": "A",
-	"minTime": 10,
-	"maxTime": 20
+	"durationTime": 0
 }, {
 	"id": 2,
 	"taskName": "B",
-	"minTime": 50,
-	"maxTime": 60
+	"durationTime": 5
 }, {
 	"id": 3,
 	"taskName": "C",
-	"minTime": 50,
-	"maxTime": 60
+	"durationTime": 11
 }
 ]
