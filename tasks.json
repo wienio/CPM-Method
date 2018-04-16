@@ -1,15 +1,40 @@
 [
-{
-	"id": 1,
-	"taskName": "A",
-	"durationTime": 0
-}, {
-	"id": 2,
-	"taskName": "B",
-	"durationTime": 5
-}, {
-	"id": 3,
-	"taskName": "C",
-	"durationTime": 11
-}
+	{
+		"id": 1,
+		"taskName": "A",
+		"edges": [
+			{
+				"duration": 5,
+				"id": 2
+			}, {
+				"duration": 11,
+				"id": 3
+			}
+		]
+	},
+	{
+		"id": 2,
+		"taskName": "B",
+		"edges": [
+			{
+				"duration": 5,
+				"id": 4
+			}
+		]
+	},
+	{
+		"id": 3,
+		"taskName": "C",
+		"edges": [
+			{
+				"duration": 5,
+				"id": 4
+			}
+		]
+	},
+	{
+		"id": 4,
+		"taskName": "D",
+		"edges": null
+	}
 ]

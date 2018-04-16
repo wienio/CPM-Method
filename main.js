@@ -6,11 +6,10 @@ var firstTaskForm = '<form><p>Nazwa zadania:</p><br><input type="text" class="ta
 var taskForm = '<form><label for="taskName">Nazwa zadania</label><input type="text" required="true" placeholder="nazwa">  </form>'
 
 class Task {
-    constructor(taskName, durationTime, previousIds) {
+    constructor(taskName, durationTime, edges) {
         this.id = TASKID
         this.taskName = taskName
-        this.durationTime = durationTime
-        this.previous = previousIds
+        this.edges = edges
     }
 }
 
@@ -24,7 +23,7 @@ function addDiv() {
         taskDiv.className = 'task-container'
     }
     TASKID++;
-    
+
     taskDiv.className = 'task-container'
     taskDiv.id = 'task-container' + TASKID
     // taskDiv.innerHTML = 'Dodaj informacje o zadaniu: ' + '<br><input type="text" name="myInputs[]">' + '<br><button>Zatwierdz</button>'
@@ -47,15 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-function checkVariablesIfIsntUndefined(objectList) {
-    objectList.forEach((element) => {
-        if (typeof element.durationTime === 'undefined' || typeof element.taskName === 'undefined' || typeof element.id === 'undefined') {
-            return false
-        }
-        return true;
-    })
-}
-
 function readJsonTaskFile(jsonFile) {
     var file = jsonFile.target.files[0];
     if (!file) {
@@ -75,16 +65,35 @@ function readJsonTaskFile(jsonFile) {
             taskList.push(Object.assign(new Task, element))
         })
 
-        if (checkVariablesIfIsntUndefined(taskList)) {
-            alert("Podany plik zawiera błędne dane!")
-            taskList = []
-        }
     };
     reader.readAsText(file);
 }
 
 function calculateCpm() {
 
+}
+
+function recursive(discovered, tasks, que) {
+
+    if (que.length === 0) {
+        return
+    }
+
+    let value = que[0]
+    que.shift()
+
+    if (taskList.previous !== undefined) {
+        taskList.previous.forEach((element, index) => {
+            console.log('jeb')
+            if (discovered[index] === false) {
+                discovered[index] = true
+                que.push(element.id)
+            }
+            console.log(element.taskName + '<=')
+        })
+    }
+
+    recursive(discovered, tasks, que)
 }
 
 document.getElementById('file-input').addEventListener('change', readJsonTaskFile, false);
@@ -109,4 +118,23 @@ jsPlumb.bind("ready", function () {
         target: 'kontakt'
     })
     // your jsPlumb related init code goes here
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.calculate-cpm').addEventListener('click', function () {
+        var discovered = []
+        var que = []
+
+        taskList.forEach(() => {
+            discovered.push(false)
+        })
+
+        taskList.forEach((element, index) => {
+            if (discovered[index] === false) {
+                discovered[index] = true
+                que.push(index)
+                recursive(discovered, tasks, que)
+            }
+        })
+    });
 });
