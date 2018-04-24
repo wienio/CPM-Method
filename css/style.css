@@ -19,6 +19,12 @@ input[type="text"] {
     font-size: 18px;
 }
 
+#results {
+    font-size: 25px;
+    position: fixed;
+    bottom: 5%;
+}
+
 .task-container {
     width: 25vh;
     height: 15vh;

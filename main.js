@@ -70,34 +70,12 @@ function readJsonTaskFile(jsonFile) {
     reader.readAsText(file);
 }
 
-function calculateCpm(paths) {
-    var durations = []
-    var totalTime = 0
-
-    paths.forEach((path) => {
-        path.forEach((val) => {
-            console.log(val)
-            if (taskList[val - 1].edges !== null) {
-                taskList[val - 1].edges.forEach((edge) => {
-                    console.log('edge id = ' + edge.id + ', a val = ' + val)
-                    if (edge.id == val) {
-                        console.log('Jestem w srodku !')
-                        totalTime += edge.duration
-                    }
-                })
-            }
-        })
-        durations.push(totalTime)
-        totalTime = 0
-    })
-    console.log(durations)
-}
-
 document.getElementById('file-input').addEventListener('change', readJsonTaskFile, false);
 
 jsPlumb.importDefaults({
     Connector: ["Flowchart", { curviness: 150 }],
-    Anchors: ["RightMiddle", "LeftMiddle"]
+    Anchors: ["RightMiddle", "LeftMiddle"],
+    ConnectionsDetachable: false
 });
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -107,8 +85,8 @@ document.addEventListener('DOMContentLoaded', function () {
         calcPaths(taskList[0], singlePath)
         fillPaths()
         addTasksDivsAndConnections()
-
-        // calculateCpm(allPaths)
+        var durations = calcLongestPath()
+        showCriticalPath(durations)
 
         console.log(allPaths)
     });
@@ -117,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
 var allPaths = []
 
 function calcPaths(task, array) {
-    // array.push(task.taskName)
 
     if (task.edges === null) {
         array.push(task.id)
@@ -128,7 +105,6 @@ function calcPaths(task, array) {
 
     task.edges.forEach((element, index) => {
         array.push(task.id)
-        array.push(element.duration)
         calcPaths(taskList[element.id - 1], array)
         array = []
     })
@@ -181,4 +157,49 @@ function addTasksDivsAndConnections() {
 
     document.getElementById('file-input').style.display = 'none'
     document.getElementById('cpm-button').style.display = 'none'
+}
+
+function calcLongestPath() {
+    var durations = []
+    for (let i = 0; i < allPaths.length; ++i) {
+        var durationTime = 0
+        for (let j = 0; j < allPaths[i].length - 1; ++j) {
+            if (taskList[allPaths[i][j] - 1].edges) {
+                taskList[allPaths[i][j] - 1].edges.forEach((edge) => {
+                    if (edge.id === allPaths[i][j + 1]) {
+                        durationTime += edge.duration
+                    }
+                })
+            }
+        }
+        durations.push(durationTime)
+    }
+    return durations
+}
+
+function showCriticalPath(paths) {
+    var allMaxDurationsIndexes = []
+    var maxDurationValue = Math.max(...paths)
+    paths.forEach((val, index) => {
+        if (maxDurationValue === val) {
+            allMaxDurationsIndexes.push(index)
+        }
+    })
+
+    var path = ''
+    allMaxDurationsIndexes.forEach((value, index) => {
+        allPaths[value].forEach((val) => {
+            document.getElementById('task-container' + val).style.border = "3px solid red"
+            path += taskList[val - 1].taskName
+            if (taskList[val - 1].edges) {
+                path += ' --> '
+            }
+        })
+        if(index !== allMaxDurationsIndexes.length - 1) {
+            path += '<br>'
+        }
+    })
+
+    var result = document.getElementById('results')
+    result.innerHTML += path + '<br>' + 'Czas: ' + '<br>' + Math.max(...paths) + ' dni'
 }
