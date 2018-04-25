@@ -7,16 +7,41 @@ body {
 
 p {
     margin: 0;
-    padding-top: 10px;
-    margin-bottom: 5px;
+    margin-left: 6px;
+    padding-top: 4px;
+    margin-bottom: 4px;
 }
 
-h1 {
-    display: flex;
+.button {
+    margin-left: 3%;
+    cursor: pointer;
+    padding: 10px 15px;
+    background-color: #58a5ff;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
 }
 
 input[type="text"] {
-    font-size: 18px;
+    margin-left: 4px;
+    padding-left: 5px;
+    margin-bottom: 4px;
+    width: 20vh;
+    font-size: 14px;
+}
+
+#file-input {
+    margin-left: 0;
+    padding: 10px 0;
+    cursor: pointer;
+    background: inherit;
+    color: black;
+    position: absolute;
+    bottom: 30%;
+    left: 5%;
 }
 
 #results {
@@ -26,6 +51,8 @@ input[type="text"] {
 }
 
 .task-container {
+    margin-top: 3%;
+    margin-left: 2%;
     width: 25vh;
     height: 15vh;
     position: absolute;
@@ -34,6 +61,7 @@ input[type="text"] {
 }
 
 .calculate-cpm {
+    margin-left: 0;
     position: absolute;
     bottom: 35%;
     left: 5%;
@@ -45,20 +73,8 @@ input[type="text"] {
     border: solid red 1px;
 }
 
-.kontakt {
-    font-size: 30px;
-}
-
-#file-input {
-    position: absolute;
-    bottom: 35%;
-    left: 25%;
-}
-
-.task-text {
-    
-}
-
-.task-input {
-    margin-bottom: 5px
+.submit-task {
+    margin-top: 5px;
+    margin-left: 10px;
+    padding: 4px 8px;
 }

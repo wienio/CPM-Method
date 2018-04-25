@@ -2,8 +2,8 @@
 // import * as jsPlumb from 'jsplumb.js'
 
 var TASKID = 0
-var firstTaskForm = '<form onsubmit="return submitFunc()"><p>Nazwa zadania:</p><br><input type="text" class="task-input" required="true" placeholder="nazwa"><br>Czas trwania:<br><input type="text" value="0" readonly="readonly"><br><input type="submit" value="Zatwierdź">  </form>'
-var taskForm = '<form onsubmit="return submitFunc()><label for="taskName">Nazwa zadania</label><input type="text" required="true" placeholder="nazwa">  <input type="submit" value="Zatwierdź"></form>'
+var firstTaskForm = '<form onsubmit="return submitFunc()"><p>Nazwa zadania:</p><input type="text" class="task-input" required="true" placeholder="Nazwa"><p>Czas trwania:</p><input type="text" value="0" readonly="readonly"><br><input class="button submit-task" type="submit" value="Zatwierdź">  </form>'
+var taskForm = '<form onsubmit="return submitFunc()><label for="taskName">Nazwa zadania</label><input type="text" required="true" placeholder="nazwa"><input type="submit" value="Zatwierdź"></form>'
 
 class Task {
     constructor(taskName, durationTime, edges) {
@@ -19,6 +19,7 @@ function addTaskDiv() {
     var taskDiv = document.createElement('div')
     if (TASKID === 0) {
         document.getElementById('file-input').disabled = true
+        document.getElementById('file-input').style.cursor = 'auto'
         taskDiv.innerHTML = firstTaskForm
         taskDiv.className = 'task-container'
     }
@@ -110,8 +111,8 @@ function calcPaths(task, array) {
     })
 }
 
-function submitFunc(event) {
-    console.log(event)
+function submitFunc() {
+    console.log(document.getElementsByClassName('task-input')[0].value)
     return false
 }
 
@@ -195,7 +196,7 @@ function showCriticalPath(paths) {
                 path += ' --> '
             }
         })
-        if(index !== allMaxDurationsIndexes.length - 1) {
+        if (index !== allMaxDurationsIndexes.length - 1) {
             path += '<br>'
         }
     })
