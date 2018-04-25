@@ -3,9 +3,10 @@
 
 var TASKID = 1
 var taskForm = '<form onsubmit="return submitFunc()"><p>Nazwa zadania:</p><input type="text" class="task-input" required="true" placeholder="Nazwa"><p>Następne zadania:</p><input type="text" class="task-input" placeholder="Np. 2,3"><p>Czasy trwania:</p><input type="text" class="task-input" placeholder="Np. 5,8"><input class="button submit-task" type="submit" value="Zatwierdź"></form>'
+var taskReadFromJson = true
 
 class Task {
-    constructor(taskName, durationTime, edges) {
+    constructor(taskName, edges) {
         this.id = TASKID
         this.taskName = taskName
         this.edges = edges
@@ -16,6 +17,7 @@ var taskList = []
 var allPaths = []
 
 function addTaskDiv() {
+    taskReadFromJson = false
     if (TASKID === 1) {
         document.getElementById('file-input').style.display = 'none'
     }
@@ -28,8 +30,6 @@ function addTaskDiv() {
 
     document.getElementById('add-task').disabled = true
     jsPlumb.draggable(taskDiv)
-
-    TASKID++;
 }
 
 function readJsonTaskFile(jsonFile) {
@@ -53,17 +53,44 @@ function readJsonTaskFile(jsonFile) {
         alert('Zaimportowano zadania, policz ścieżkę krytyczną')
     };
     reader.readAsText(file);
+    document.getElementById('add-task').style.display = 'none'
 }
 
 function submitFunc() {
     var formValues = document.getElementsByClassName('task-input')
+    var edges = null
 
-    var neighbours = formValues[1].value.split(',').map(Number)
-    var durations = formValues[2].value.split(',').map(Number)
-    //TODO dodawanie taskow po serializacji
+    if (formValues[1].value !== '') {
+        var neighbours = formValues[1].value.split(',').map(Number)
+        var durations = formValues[2].value.split(',').map(Number)
 
-    taskList.push(new Task(formValues[0].value, formValues[1].value, formValues[2].value))
-    console.log(taskList)
+        edges = durations.map((val, index) => {
+            return {
+                duration: val,
+                id: neighbours[index]
+            }
+        })
+    }
+
+    var taskInfo = '<p>Nazwa zadania: ' + formValues[0].value + '</p><p>Następne zadania(nr): '
+    if (edges !== null) {
+        edges.forEach((value, index) => {
+            taskInfo += value.id
+            if (index !== edges.length - 1) {
+                taskInfo += ', '
+            }
+        })
+    } else {
+        taskInfo += '-'
+    }
+    taskList.push(new Task(formValues[0].value, edges))
+    taskInfo += '</p>'
+
+    document.getElementById('task-container' + TASKID).innerHTML = taskInfo
+    document.getElementById('task-container' + TASKID).setAttribute('style', 'width: 13vh')
+    document.getElementById('task-container' + TASKID).setAttribute('style', 'height: 8vh')
+
+    TASKID++
 
     document.getElementById('add-task').disabled = false
     return false
@@ -102,14 +129,30 @@ function fillPaths() {
 }
 
 function addTasksDivsAndConnections() {
-    taskList.forEach((task) => {
-        var taskDiv = document.createElement('div')
-        taskDiv.innerHTML = '<p>Nazwa zadania: ' + task.taskName + '</p>'
-        taskDiv.className = 'task-container'
-        taskDiv.id = 'task-container' + task.id
-        document.getElementById('tasks').appendChild(taskDiv)
-        jsPlumb.draggable(taskDiv)
-    })
+    if(taskReadFromJson === true) {
+        taskList.forEach((task) => {
+            var taskDiv = document.createElement('div')
+            taskDiv.setAttribute('style', 'width: 13vh')
+            taskDiv.setAttribute('style', 'height: 8vh')
+            var taskInfo ='<p>Nazwa zadania: ' + task.taskName + '</p><p>Następne zadania(nr): '
+            if (task.edges !== null) {
+                task.edges.forEach((value, index) => {
+                    taskInfo += value.id
+                    if (index !== task.edges.length - 1) {
+                        taskInfo += ', '
+                    }
+                })
+            } else {
+                taskInfo += '-'
+            }
+            taskInfo += '</p>'
+            taskDiv.innerHTML = taskInfo
+            taskDiv.className = 'task-container'
+            taskDiv.id = 'task-container' + task.id
+            document.getElementById('tasks').appendChild(taskDiv)
+            jsPlumb.draggable(taskDiv)
+        })
+    }
 
     taskList.forEach((task) => {
         var taskDiv = document.getElementById('task-container' + task.id)
@@ -184,7 +227,7 @@ jsPlumb.importDefaults({
     Connector: ["Flowchart", {
         curviness: 150
     }],
-    Anchors: ["RightMiddle", "LeftMiddle"],
+    Anchors: [[1, 0.5, 0, 0], [0, 0.5, 0, 0]],
     ConnectionsDetachable: false
 });
 
