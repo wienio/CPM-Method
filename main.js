@@ -1,9 +1,8 @@
 // import { jsPlumb } from "./jsplumb";
 // import * as jsPlumb from 'jsplumb.js'
 
-var TASKID = 0
-var firstTaskForm = '<form onsubmit="return submitFunc()"><p>Nazwa zadania:</p><input type="text" class="task-input" required="true" placeholder="Nazwa"><p>Czas trwania:</p><input type="text" value="0" readonly="readonly"><br><input class="button submit-task" type="submit" value="Zatwierdź">  </form>'
-var taskForm = '<form onsubmit="return submitFunc()><label for="taskName">Nazwa zadania</label><input type="text" required="true" placeholder="nazwa"><input type="submit" value="Zatwierdź"></form>'
+var TASKID = 1
+var taskForm = '<form onsubmit="return submitFunc()"><p>Nazwa zadania:</p><input type="text" class="task-input" required="true" placeholder="Nazwa"><p>Następne zadania:</p><input type="text" class="task-input" placeholder="Np. 2,3"><p>Czasy trwania:</p><input type="text" class="task-input" placeholder="Np. 5,8"><input class="button submit-task" type="submit" value="Zatwierdź"></form>'
 
 class Task {
     constructor(taskName, durationTime, edges) {
@@ -14,39 +13,24 @@ class Task {
 }
 
 var taskList = []
+var allPaths = []
 
 function addTaskDiv() {
-    var taskDiv = document.createElement('div')
-    if (TASKID === 0) {
-        document.getElementById('file-input').disabled = true
-        document.getElementById('file-input').style.cursor = 'auto'
-        taskDiv.innerHTML = firstTaskForm
-        taskDiv.className = 'task-container'
+    if (TASKID === 1) {
+        document.getElementById('file-input').style.display = 'none'
     }
+    var taskDiv = document.createElement('div')
 
+    taskDiv.innerHTML = taskForm
     taskDiv.className = 'task-container'
     taskDiv.id = 'task-container' + TASKID
-    // taskDiv.innerHTML = 'Dodaj informacje o zadaniu: ' + '<br><input type="text" name="myInputs[]">' + '<br><button>Zatwierdz</button>'
-    // taskDiv.style.cssText = 'width: 30vh; height: 100px; background-color: red; margin: 5px;'
     document.getElementById('tasks').appendChild(taskDiv)
 
+    document.getElementById('add-task').disabled = true
     jsPlumb.draggable(taskDiv)
 
-    jsPlumb.addEndpoint(taskDiv)
-    jsPlumb.connect({
-        source: taskDiv,
-        target: document.getElementById('task-container' + (TASKID - 1))
-        // target: 'tasks'
-    })
-    console.log(TASKID)
     TASKID++;
 }
-
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('.add-task').addEventListener('click', function () {
-        addTaskDiv()
-    });
-});
 
 function readJsonTaskFile(jsonFile) {
     var file = jsonFile.target.files[0];
@@ -71,29 +55,19 @@ function readJsonTaskFile(jsonFile) {
     reader.readAsText(file);
 }
 
-document.getElementById('file-input').addEventListener('change', readJsonTaskFile, false);
+function submitFunc() {
+    var formValues = document.getElementsByClassName('task-input')
 
-jsPlumb.importDefaults({
-    Connector: ["Flowchart", { curviness: 150 }],
-    Anchors: ["RightMiddle", "LeftMiddle"],
-    ConnectionsDetachable: false
-});
+    var neighbours = formValues[1].value.split(',').map(Number)
+    var durations = formValues[2].value.split(',').map(Number)
+    //TODO dodawanie taskow po serializacji
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('.calculate-cpm').addEventListener('click', function () {
-        var singlePath = []
+    taskList.push(new Task(formValues[0].value, formValues[1].value, formValues[2].value))
+    console.log(taskList)
 
-        calcPaths(taskList[0], singlePath)
-        fillPaths()
-        addTasksDivsAndConnections()
-        var durations = calcLongestPath()
-        showCriticalPath(durations)
-
-        console.log(allPaths)
-    });
-});
-
-var allPaths = []
+    document.getElementById('add-task').disabled = false
+    return false
+}
 
 function calcPaths(task, array) {
 
@@ -109,11 +83,6 @@ function calcPaths(task, array) {
         calcPaths(taskList[element.id - 1], array)
         array = []
     })
-}
-
-function submitFunc() {
-    console.log(document.getElementsByClassName('task-input')[0].value)
-    return false
 }
 
 function fillPaths() {
@@ -140,12 +109,10 @@ function addTasksDivsAndConnections() {
         taskDiv.id = 'task-container' + task.id
         document.getElementById('tasks').appendChild(taskDiv)
         jsPlumb.draggable(taskDiv)
-        // jsPlumb.addEndpoint(taskDiv)
     })
 
     taskList.forEach((task) => {
         var taskDiv = document.getElementById('task-container' + task.id)
-        jsPlumb.addEndpoint(taskDiv)
         if (task.edges !== null) {
             task.edges.forEach((edge) => {
                 jsPlumb.connect({
@@ -204,3 +171,32 @@ function showCriticalPath(paths) {
     var result = document.getElementById('results')
     result.innerHTML += path + '<br>' + 'Czas: ' + '<br>' + Math.max(...paths) + ' dni'
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.add-task').addEventListener('click', function () {
+        addTaskDiv()
+    });
+});
+
+document.getElementById('file-input').addEventListener('change', readJsonTaskFile, false);
+
+jsPlumb.importDefaults({
+    Connector: ["Flowchart", {
+        curviness: 150
+    }],
+    Anchors: ["RightMiddle", "LeftMiddle"],
+    ConnectionsDetachable: false
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('.calculate-cpm').addEventListener('click', function () {
+        var singlePath = []
+
+        calcPaths(taskList[0], singlePath)
+        fillPaths()
+        addTasksDivsAndConnections()
+        var durations = calcLongestPath()
+        showCriticalPath(durations)
+
+    });
+});
